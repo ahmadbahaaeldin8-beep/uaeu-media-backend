@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Studio Reservation - UAEU</title>
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load icons non-blocking; drop external Google Fonts and use system fonts for speed -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="images/mci-logo.png" alt="M&CI Logo" class="logo" loading="lazy" decoding="async" fetchpriority="low">
+                    <div class="title-section">
+                        <h1 id="mainTitle">Media Studio Reservation</h1>
+                        <p id="subtitle">UAE University - Media & Creative Industries Department</p>
+                    </div>
+                </div>
+                <!-- Customize option removed -->
+            </div>
+        </header>
+
+        <!-- Customize option removed -->
+
+        <main class="main-content">
+            <div class="reservation-card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-plus"></i>
+                    <h2>Book Your Studio Session</h2>
+                    <p>Reserve a media studio for your project</p>
+                </div>
+
+                <form id="reservationForm" class="reservation-form">
+                    <!-- Student Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Student Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="studentName">Full Name *</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentId">Student ID *</label>
+                                <input type="text" id="studentId" name="studentId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <!-- Removed combined College/Department select as requested -->
+                        </div>
+                    </div>
+
+                    <!-- Reservation Details -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-video"></i> Reservation Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="collegeText">College *</label>
+                                <input type="text" id="collegeText" name="collegeText" placeholder="Enter your college" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="departmentText">Department *</label>
+                                <input type="text" id="departmentText" name="departmentText" placeholder="Enter your department" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="date">Reservation Date *</label>
+                                <input type="date" id="date" name="date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fromTime">From *</label>
+                                <input type="time" id="fromTime" name="fromTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="toTime">To *</label>
+                                <input type="time" id="toTime" name="toTime" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="duration">Duration *</label>
+                                <input type="text" id="duration" name="duration" placeholder="e.g., 2 hours" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="supervisor">Studio Supervisor *</label>
+                                <select id="supervisor" name="supervisor" required>
+                                    <option value="">Select Supervisor</option>
+                                    <option value="Mr.Ahmad Askandr">Mr.Ahmad Askandr</option>
+                                    <option value="Mr.AlMothana">Mr.AlMothana</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Details -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-diagram-project"></i> Project Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="projectName">Project Name *</label>
+                                <input type="text" id="projectName" name="projectName" placeholder="Enter your project name" required>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="aboutProject">About The Project *</label>
+                                <textarea id="aboutProject" name="aboutProject" rows="8" placeholder="Describe your project in detail..." required></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="neededTools">Needed Tools *</label>
+                                <textarea id="neededTools" name="neededTools" rows="6" placeholder="List the tools you need" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Requirements section removed -->
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Reservation Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Availability Display removed as requested -->
+        </main>
+
+        <!-- Footer removed as requested -->
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h3>Reservation Submitted Successfully!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Your studio reservation request has been submitted and is pending approval.</p>
+                <p>You will receive an email confirmation once your request is reviewed.</p>
+                <div class="reservation-summary" id="reservationSummary">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/reservation.js?v=2" defer></script>
+</body>
+</html>

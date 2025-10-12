@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Media Studio Management</title>
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link rel="stylesheet" href="css/admin-style.css">
+    <!-- Load icons non-blocking; drop external Google Fonts and use system fonts for speed -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+    </style>
+</head>
+<body class="admin-body">
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/mci-logo.png" alt="M&CI Logo" class="sidebar-logo" loading="lazy" decoding="async" fetchpriority="low">
+                <h2>Admin Panel</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#reservations" class="nav-item" data-section="reservations">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Reservations</span>
+                </a>
+                <a href="#classes" class="nav-item" data-section="classes">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Class Schedules</span>
+                </a>
+                <a href="#studios" class="nav-item" data-section="studios">
+                    <i class="fas fa-video"></i>
+                    <span>Studio Management</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Administrator</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+                    <p>Manage studio reservations and class schedules</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="pendingCount">0</h3>
+                            <p>Pending Reservations</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon approved">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="approvedCount">0</h3>
+                            <p>Approved Today</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="totalCount">0</h3>
+                            <p>Total Reservations</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon classes">
+                            <i class="fas fa-chalkboard"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="classesCount">0</h3>
+                            <p>Active Classes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Recent Pending Reservations</h3>
+                        </div>
+                        <div class="card-content">
+                            <div id="recentPending" class="reservation-list">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                            <h3 style="margin:0;"><i class="fas fa-calendar-week"></i> Daily Schedule</h3>
+                            <input type="date" id="scheduleDate" style="max-width:180px;" />
+                        </div>
+                        <div class="card-content">
+                            <div id="todaySchedule" class="schedule-list">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reservations Section -->
+            <section id="reservations-section" class="content-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-calendar-check"></i> Reservation Management</h1>
+                    <div class="section-actions">
+                        <div class="filter-group">
+                            <select id="statusFilter" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <select id="studioFilter" class="filter-select">
+                                <option value="">All Studios</option>
+                                <option value="video-production">Video Production</option>
+                                <option value="audio-recording">Audio Recording</option>
+                                <option value="photography">Photography</option>
+                                <option value="editing-suite">Editing Suite</option>
+                                <option value="live-streaming">Live Streaming</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reservations-table-container">
+                    <table class="reservations-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Studio</th>
+                                <th>Date & Time</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationsTableBody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Classes Section -->
+            <section id="classes-section" class="content-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-chalkboard-teacher"></i> Class Schedule Management</h1>
+                    <div class="section-actions">
+                        <button class="btn-primary" onclick="openAddClassModal()">
+                            <i class="fas fa-plus"></i> Add New Class
+                        </button>
+                    </div>
+                </div>
+
+                <div class="classes-grid" id="classesGrid">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Studios Section -->
+            <section id="studios-section" class="content-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-video"></i> Studio Management</h1>
+                    <p>Manage studio availability and settings</p>
+                </div>
+
+                <div class="studios-grid" id="studiosGrid">
+                    <div class="studio-card">
+                        <div class="studio-header">
+                            <i class="fas fa-video"></i>
+                            <h3>Video Production Studio</h3>
+                        </div>
+                        <div class="studio-status available">
+                            <i class="fas fa-circle"></i>
+                            Available
+                        </div>
+                        <div class="studio-info">
+                            <p><strong>Equipment:</strong> 4K Cameras, Professional Lighting, Audio System</p>
+                            <p><strong>Capacity:</strong> 8 people</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-card">
+                        <div class="studio-header">
+                            <i class="fas fa-microphone"></i>
+                            <h3>Audio Recording Studio</h3>
+                        </div>
+                        <div class="studio-status available">
+                            <i class="fas fa-circle"></i>
+                            Available
+                        </div>
+                        <div class="studio-info">
+                            <p><strong>Equipment:</strong> Professional Microphones, Mixing Console, Monitors</p>
+                            <p><strong>Capacity:</strong> 4 people</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-card">
+                        <div class="studio-header">
+                            <i class="fas fa-camera"></i>
+                            <h3>Photography Studio</h3>
+                        </div>
+                        <div class="studio-status occupied">
+                            <i class="fas fa-circle"></i>
+                            In Use
+                        </div>
+                        <div class="studio-info">
+                            <p><strong>Equipment:</strong> DSLR Cameras, Studio Lighting, Backdrops</p>
+                            <p><strong>Capacity:</strong> 6 people</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-card">
+                        <div class="studio-header">
+                            <i class="fas fa-edit"></i>
+                            <h3>Editing Suite</h3>
+                        </div>
+                        <div class="studio-status available">
+                            <i class="fas fa-circle"></i>
+                            Available
+                        </div>
+                        <div class="studio-info">
+                            <p><strong>Equipment:</strong> High-end Workstations, Professional Software</p>
+                            <p><strong>Capacity:</strong> 12 people</p>
+                        </div>
+                    </div>
+
+                    <div class="studio-card">
+                        <div class="studio-header">
+                            <i class="fas fa-broadcast-tower"></i>
+                            <h3>Live Streaming Studio</h3>
+                        </div>
+                        <div class="studio-status available">
+                            <i class="fas fa-circle"></i>
+                            Available
+                        </div>
+                        <div class="studio-info">
+                            <p><strong>Equipment:</strong> Streaming Setup, Multiple Cameras, Green Screen</p>
+                            <p><strong>Capacity:</strong> 5 people</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Reservation Details Modal -->
+    <div id="reservationModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Reservation Details</h3>
+                <button class="modal-close" onclick="closeReservationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="reservationDetails">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-success" onclick="approveReservation()">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-danger" onclick="rejectReservation()">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button class="btn-secondary" onclick="closeReservationModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Class Modal -->
+    <div id="addClassModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Add New Class</h3>
+                <button class="modal-close" onclick="closeAddClassModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addClassForm" class="class-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="className">Class Name *</label>
+                            <input type="text" id="className" name="className" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="instructor">Instructor *</label>
+                            <input type="text" id="instructor" name="instructor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="classDate">Date *</label>
+                            <input type="date" id="classDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="classStartTime">Start Time *</label>
+                            <input type="time" id="classStartTime" name="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="classEndTime">End Time *</label>
+                            <input type="time" id="classEndTime" name="endTime" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="addClass()">
+                    <i class="fas fa-save"></i> Add Class
+                </button>
+                <button class="btn-secondary" onclick="closeAddClassModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Class Modal -->
+    <div id="editClassModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Class</h3>
+                <button class="modal-close" onclick="closeEditClassModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editClassForm" class="class-form">
+                    <input type="hidden" id="editClassId" name="id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="editClassName">Class Name *</label>
+                            <input type="text" id="editClassName" name="className" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editInstructor">Instructor *</label>
+                            <input type="text" id="editInstructor" name="instructor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editClassDate">Date *</label>
+                            <input type="date" id="editClassDate" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editClassStartTime">Start Time *</label>
+                            <input type="time" id="editClassStartTime" name="startTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editClassEndTime">End Time *</label>
+                            <input type="time" id="editClassEndTime" name="endTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMaxStudents">Max Students</label>
+                            <input type="number" id="editMaxStudents" name="maxStudents" min="1" step="1">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="updateClass()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn-secondary" onclick="closeEditClassModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-dashboard.js" defer></script>
+</body>
+</html>
