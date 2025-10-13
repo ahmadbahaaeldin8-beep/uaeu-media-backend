@@ -242,7 +242,7 @@ class ReservationSystem {
 
             // Send email notification to admin
             try {
-                const emailResponse = await fetch('https://mediabook-backend.manus.space/api/submit-reservation', {
+                const emailResponse = await fetch('https://mzhyi8c1mgmj.manus.space/api/submit-reservation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

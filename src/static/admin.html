@@ -39,6 +39,10 @@
                     <i class="fas fa-video"></i>
                     <span>Studio Management</span>
                 </a>
+                <a href="#borrowing" class="nav-item" data-section="borrowing">
+                    <i class="fas fa-toolbox"></i>
+                    <span>Borrowing Equipment</span>
+                </a>
             </nav>
             
             <div class="sidebar-footer">
@@ -269,6 +273,43 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Borrowing Equipment Section -->
+            <section id="borrowing-section" class="content-section">
+                <div class="section-header">
+                    <h1><i class="fas fa-toolbox"></i> Borrowing Equipment Schedule</h1>
+                    <div class="section-actions">
+                        <div class="filter-group">
+                            <select id="borrowStatusFilter" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="returned">Returned</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reservations-table-container">
+                    <table class="reservations-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Class</th>
+                                <th>Borrow Date</th>
+                                <th>Return Date</th>
+                                <th>Tools</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrowTableBody">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -389,6 +430,35 @@
                     <i class="fas fa-save"></i> Save Changes
                 </button>
                 <button class="btn-secondary" onclick="closeEditClassModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrow Details Modal -->
+    <div id="borrowModal" class="modal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3><i class="fas fa-info-circle"></i> Borrow Request Details</h3>
+                <button class="modal-close" onclick="closeBorrowModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="borrowDetails">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-success" onclick="approveBorrow()">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-danger" onclick="rejectBorrow()">
+                    <i class="fas fa-times"></i> Reject
+                </button>
+                <button class="btn-primary" onclick="markAsReturned()">
+                    <i class="fas fa-undo"></i> Mark as Returned
+                </button>
+                <button class="btn-secondary" onclick="closeBorrowModal()">
                     Cancel
                 </button>
             </div>

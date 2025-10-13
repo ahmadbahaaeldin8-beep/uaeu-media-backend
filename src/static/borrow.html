@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrow Equipment - Media Studio</title>
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="images/mci-logo.png" alt="M&CI Logo" class="logo" loading="lazy" decoding="async" fetchpriority="low">
+                    <div class="title-section">
+                        <h1 id="mainTitle">Borrow Equipment</h1>
+                        <p id="subtitle">UAE University - Media & Creative Industries Department</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="reservation-card">
+                <div class="card-header">
+                    <i class="fas fa-toolbox"></i>
+                    <h2>Borrow Equipment Request</h2>
+                    <p>Request equipment borrowing for your project</p>
+                </div>
+
+                <form id="borrowForm" class="reservation-form">
+                    <!-- Student Information -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Student Information</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="studentName">Full Name *</label>
+                                <input type="text" id="studentName" name="studentName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="studentId">Student ID *</label>
+                                <input type="text" id="studentId" name="studentId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrowing & Class Details -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-box-open"></i> Borrowing & Class Details</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="borrowDate">Borrow Date *</label>
+                                <input type="date" id="borrowDate" name="borrowDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="returnDate">Return Date *</label>
+                                <input type="date" id="returnDate" name="returnDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dr">DR</label>
+                                <input type="text" id="dr" name="dr" placeholder="Enter DR">
+                            </div>
+                            <div class="form-group">
+                                <label for="classType">Class *</label>
+                                <select id="classType" name="classType" required>
+                                    <option value="">Select Class</option>
+                                    <option value="TV 1">TV 1</option>
+                                    <option value="TV2">TV2</option>
+                                    <option value="Digital">Digital</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="classOther">Class (write here)</label>
+                                <input type="text" id="classOther" name="classOther" placeholder="If Other, specify class">
+                            </div>
+                            <div class="form-group">
+                                <label for="supervisor">Studio Supervisor *</label>
+                                <select id="supervisor" name="supervisor" required>
+                                    <option value="">Select Supervisor</option>
+                                    <option value="Mr.Ahmad Askandr">Mr.Ahmad Askandr</option>
+                                    <option value="Mr.AlMothana">Mr.AlMothana</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Needed Tools -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-tools"></i> Needed Tools</h3>
+                        <div class="form-grid">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label for="tools">Needed Tools *</label>
+                                <textarea id="tools" name="tools" rows="8" placeholder="List the tools you need (e.g., Camera, Tripod, Microphone, Lighting Kit)" required></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Borrow Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <i class="fas fa-check-circle"></i>
+                <h3>Request Submitted Successfully!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Your equipment borrow request has been submitted and is pending approval.</p>
+                <div id="borrowSummary"></div>
+                <p style="margin-top: 1rem; color: #64748b; font-size: 0.875rem;">
+                    You will be notified once your request is reviewed by the supervisor.
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/borrow.js" defer></script>
+</body>
+</html>
+

@@ -5,7 +5,9 @@ class AdminDashboard {
         this.reservations = [];
         this.classes = [];
         this.studios = [];
+        this.borrows = [];
         this.currentReservationId = null;
+        this.currentBorrowId = null;
         this.editingClassId = null;
         this.init();
     }
@@ -69,6 +71,14 @@ class AdminDashboard {
             });
         } catch (e) {
             this.classes = [];
+        }
+
+        // Load borrows from localStorage (synced with borrow page)
+        try {
+            const storedBorrows = JSON.parse(localStorage.getItem('borrows')) || [];
+            this.borrows = storedBorrows;
+        } catch (e) {
+            this.borrows = [];
         }
 
         // Sample studios data
@@ -183,6 +193,9 @@ class AdminDashboard {
                 break;
             case 'studios':
                 this.renderStudiosGrid();
+                break;
+            case 'borrowing':
+                this.renderBorrowTable();
                 break;
         }
     }
@@ -726,6 +739,186 @@ class AdminDashboard {
         const mm = String(minutes).padStart(2, '0');
         return `${hh}:${mm}`;
     }
+
+    // Borrow Equipment Management Methods
+    renderBorrowTable() {
+        const tbody = document.getElementById('borrowTableBody');
+        const statusFilter = document.getElementById('borrowStatusFilter');
+        
+        if (!tbody) return;
+
+        const filterValue = statusFilter ? statusFilter.value : '';
+        let filteredBorrows = this.borrows;
+
+        if (filterValue) {
+            filteredBorrows = this.borrows.filter(b => b.status === filterValue);
+        }
+
+        // Sort by submission date (newest first)
+        filteredBorrows.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+        if (filteredBorrows.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">
+                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                        No borrow requests found
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = filteredBorrows.map(borrow => `
+            <tr>
+                <td>
+                    <div style="font-weight: 600;">${borrow.studentName}</div>
+                    <div style="font-size: 0.875rem; color: #64748b;">${borrow.studentId}</div>
+                </td>
+                <td>${borrow.classType}${borrow.classOther !== 'N/A' ? ` (${borrow.classOther})` : ''}</td>
+                <td>${new Date(borrow.borrowDate).toLocaleDateString()}</td>
+                <td>${new Date(borrow.returnDate).toLocaleDateString()}</td>
+                <td>
+                    <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${borrow.tools}">
+                        ${borrow.tools}
+                    </div>
+                </td>
+                <td>
+                    <span class="status-badge ${borrow.status}">
+                        ${borrow.status.charAt(0).toUpperCase() + borrow.status.slice(1)}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-icon" onclick="viewBorrowDetails('${borrow.id}')" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Setup filter listener
+        if (statusFilter) {
+            statusFilter.removeEventListener('change', this.borrowFilterHandler);
+            this.borrowFilterHandler = () => this.renderBorrowTable();
+            statusFilter.addEventListener('change', this.borrowFilterHandler);
+        }
+    }
+
+    viewBorrowDetails(borrowId) {
+        const borrow = this.borrows.find(b => b.id === borrowId);
+        if (!borrow) return;
+
+        this.currentBorrowId = borrowId;
+        const modal = document.getElementById('borrowModal');
+        const detailsDiv = document.getElementById('borrowDetails');
+
+        detailsDiv.innerHTML = `
+            <div class="details-grid">
+                <div class="detail-item">
+                    <strong>Student Name</strong>
+                    <span>${borrow.studentName}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Student ID</strong>
+                    <span>${borrow.studentId}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Email</strong>
+                    <span>${borrow.email}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Phone</strong>
+                    <span>${borrow.phone}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Borrow Date</strong>
+                    <span>${new Date(borrow.borrowDate).toLocaleDateString()}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Return Date</strong>
+                    <span>${new Date(borrow.returnDate).toLocaleDateString()}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>DR</strong>
+                    <span>${borrow.dr}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Class</strong>
+                    <span>${borrow.classType}${borrow.classOther !== 'N/A' ? ` (${borrow.classOther})` : ''}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Supervisor</strong>
+                    <span>${borrow.supervisor}</span>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <strong>Needed Tools</strong>
+                    <span style="white-space: pre-wrap;">${borrow.tools}</span>
+                </div>
+                <div class="detail-item">
+                    <strong>Status</strong>
+                    <span class="status-badge ${borrow.status}">
+                        ${borrow.status.charAt(0).toUpperCase() + borrow.status.slice(1)}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <strong>Submitted At</strong>
+                    <span>${new Date(borrow.submittedAt).toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+
+        modal.classList.add('show');
+    }
+
+    approveBorrow() {
+        if (!this.currentBorrowId) return;
+
+        const borrow = this.borrows.find(b => b.id === this.currentBorrowId);
+        if (!borrow) return;
+
+        borrow.status = 'approved';
+        localStorage.setItem('borrows', JSON.stringify(this.borrows));
+        
+        this.closeBorrowModal();
+        this.renderBorrowTable();
+        this.showNotification('Borrow request approved successfully', 'success');
+    }
+
+    rejectBorrow() {
+        if (!this.currentBorrowId) return;
+
+        const borrow = this.borrows.find(b => b.id === this.currentBorrowId);
+        if (!borrow) return;
+
+        borrow.status = 'rejected';
+        localStorage.setItem('borrows', JSON.stringify(this.borrows));
+        
+        this.closeBorrowModal();
+        this.renderBorrowTable();
+        this.showNotification('Borrow request rejected', 'info');
+    }
+
+    markAsReturned() {
+        if (!this.currentBorrowId) return;
+
+        const borrow = this.borrows.find(b => b.id === this.currentBorrowId);
+        if (!borrow) return;
+
+        borrow.status = 'returned';
+        localStorage.setItem('borrows', JSON.stringify(this.borrows));
+        
+        this.closeBorrowModal();
+        this.renderBorrowTable();
+        this.showNotification('Equipment marked as returned', 'success');
+    }
+
+    closeBorrowModal() {
+        const modal = document.getElementById('borrowModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+        this.currentBorrowId = null;
+    }
 }
 
 // Initialize dashboard when DOM is loaded
@@ -749,6 +942,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (id) window.adminDashboard.rejectReservation(id);
         window.adminDashboard.renderScheduleForDate(window.adminDashboard.getSelectedDate());
     };
+    // Borrow equipment functions
+    window.viewBorrowDetails = (id) => window.adminDashboard.viewBorrowDetails(id);
+    window.closeBorrowModal = () => window.adminDashboard.closeBorrowModal();
+    window.approveBorrow = () => window.adminDashboard.approveBorrow();
+    window.rejectBorrow = () => window.adminDashboard.rejectBorrow();
+    window.markAsReturned = () => window.adminDashboard.markAsReturned();
 });
 
 // Add notification styles
