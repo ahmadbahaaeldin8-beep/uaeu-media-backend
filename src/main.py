@@ -9,6 +9,8 @@ from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.reservation import reservation_bp
 from src.routes.borrow import borrow_bp
+from src.routes.reservation_status import reservation_status_bp
+from src.routes.borrow_status import borrow_status_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
@@ -19,6 +21,8 @@ CORS(app)
 app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(reservation_bp, url_prefix='/api')
 app.register_blueprint(borrow_bp, url_prefix='/api')
+app.register_blueprint(reservation_status_bp, url_prefix='/api')
+app.register_blueprint(borrow_status_bp, url_prefix='/api')
 
 # uncomment if you need to use database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
