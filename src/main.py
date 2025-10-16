@@ -34,16 +34,23 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
     'pool_recycle': 300,
+    'connect_args': {'connect_timeout': 10}
 }
-db.init_app(app)
-
-@app.before_request
-def create_tables():
-    """Create tables on first request"""
-    if not hasattr(app, '_tables_created'):
-        with app.app_context():
-            db.create_all()
-        app._tables_created = True
+try:
+    db.init_app(app)
+    
+    @app.before_request
+    def create_tables():
+        """Create tables on first request"""
+        if not hasattr(app, '_tables_created'):
+            try:
+                with app.app_context():
+                    db.create_all()
+                app._tables_created = True
+            except Exception as e:
+                print(f"Database initialization error: {e}")
+except Exception as e:
+    print(f"Database setup error: {e}")
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
