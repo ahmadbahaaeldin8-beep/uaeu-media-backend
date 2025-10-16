@@ -10,7 +10,7 @@ reservation_bp = Blueprint('reservation', __name__)
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 SENDER_EMAIL = 'uaeumediastudio@gmail.com'
-SENDER_PASSWORD = 'jwtcqyedemzfiosb'
+SENDER_PASSWORD = 'jwtcqyedemzfiosb'  # Gmail app password without spaces
 ADMIN_EMAIL = 'uaeumediastudio@gmail.com'
 
 @reservation_bp.route('/submit-reservation', methods=['POST', 'OPTIONS'])
