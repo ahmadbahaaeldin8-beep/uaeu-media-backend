@@ -10,7 +10,7 @@ borrow_status_bp = Blueprint('borrow_status', __name__)
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 SENDER_EMAIL = 'uaeumediastudio@gmail.com'
-SENDER_PASSWORD = 'your_app_password_here'
+SENDER_PASSWORD = 'jwtcqyedemzfiosb'
 
 @borrow_status_bp.route('/send-borrow-status', methods=['POST', 'OPTIONS'])
 def send_borrow_status():
