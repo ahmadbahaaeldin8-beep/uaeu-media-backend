@@ -9,8 +9,8 @@ reservation_reminder_bp = Blueprint('reservation_reminder', __name__)
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SENDER_EMAIL = 'ahmadaskandr5@gmail.com'
-SENDER_PASSWORD = 'gtgl tjik uvnt fhyz'
+SENDER_EMAIL = 'uaeumediastudio@gmail.com'
+SENDER_PASSWORD = 'your_app_password_here'
 
 @reservation_reminder_bp.route('/send-reservation-reminder', methods=['POST', 'OPTIONS'])
 def send_reservation_reminder():

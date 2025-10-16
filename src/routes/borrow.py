@@ -9,9 +9,9 @@ borrow_bp = Blueprint('borrow', __name__)
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SENDER_EMAIL = 'ahmadaskandr5@gmail.com'
-SENDER_PASSWORD = 'gtgl tjik uvnt fhyz'
-ADMIN_EMAIL = 'ahmadaskandr5@gmail.com'
+SENDER_EMAIL = 'uaeumediastudio@gmail.com'
+SENDER_PASSWORD = 'your_app_password_here'
+ADMIN_EMAIL = 'uaeumediastudio@gmail.com'
 
 @borrow_bp.route('/submit-borrow', methods=['POST', 'OPTIONS'])
 def submit_borrow():
