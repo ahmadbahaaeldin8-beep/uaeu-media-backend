@@ -29,7 +29,7 @@ app.register_blueprint(reservation_reminder_bp, url_prefix='/api')
 app.register_blueprint(borrow_reminder_bp, url_prefix='/api')
 
 # uncomment if you need to use database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_4c7zqFAwjNRg@ep-delicate-glitter-adqzwgrq-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
