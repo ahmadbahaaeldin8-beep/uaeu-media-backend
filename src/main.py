@@ -31,9 +31,19 @@ app.register_blueprint(borrow_reminder_bp, url_prefix='/api')
 # uncomment if you need to use database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_4c7zqFAwjNRg@ep-delicate-glitter-adqzwgrq-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
 db.init_app(app)
-with app.app_context():
-    db.create_all()
+
+@app.before_request
+def create_tables():
+    """Create tables on first request"""
+    if not hasattr(app, '_tables_created'):
+        with app.app_context():
+            db.create_all()
+        app._tables_created = True
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
