@@ -13,6 +13,7 @@ from src.routes.reservation_status import reservation_status_bp
 from src.routes.borrow_status import borrow_status_bp
 from src.routes.reservation_reminder import reservation_reminder_bp
 from src.routes.borrow_reminder import borrow_reminder_bp
+from src.routes.api import api_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
@@ -27,6 +28,7 @@ app.register_blueprint(reservation_status_bp, url_prefix='/api')
 app.register_blueprint(borrow_status_bp, url_prefix='/api')
 app.register_blueprint(reservation_reminder_bp, url_prefix='/api')
 app.register_blueprint(borrow_reminder_bp, url_prefix='/api')
+app.register_blueprint(api_bp)
 
 # uncomment if you need to use database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://neondb_owner:npg_4c7zqFAwjNRg@ep-delicate-glitter-adqzwgrq-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require')
