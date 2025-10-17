@@ -3,6 +3,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+from src.models.user import db
+from src.models.reservation import Reservation
 
 reservation_bp = Blueprint('reservation', __name__)
 
@@ -43,6 +45,34 @@ def submit_reservation():
         project_title = data.get('projectTitle', 'N/A')
         project_description = data.get('projectDescription', 'N/A')
         equipment_needed = data.get('equipmentNeeded', 'N/A')
+        
+        # Save to database
+        try:
+            new_reservation = Reservation(
+                student_name=student_name,
+                student_id=student_id,
+                email=email,
+                phone=phone,
+                college=college,
+                major=department,  # Using 'major' field for department
+                date=date,
+                time_from=from_time,
+                time_to=to_time,
+                duration=duration,
+                supervisor=supervisor,
+                project_name=project_title,
+                project_description=project_description,
+                needed_tools=equipment_needed,
+                status='Pending'
+            )
+            
+            db.session.add(new_reservation)
+            db.session.commit()
+            print(f"✅ Reservation saved to database with ID: {new_reservation.id}")
+        except Exception as db_error:
+            print(f"❌ Database error: {str(db_error)}")
+            db.session.rollback()
+            # Continue to send email even if database save fails
         
         # Create email message
         msg = MIMEMultipart('alternative')
@@ -200,10 +230,15 @@ def submit_reservation():
         msg.attach(MIMEText(html_body, 'html'))
         
         # Send email
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.send_message(msg)
+        try:
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                server.starttls()
+                server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                server.send_message(msg)
+            print(f"✅ Email notification sent successfully")
+        except Exception as email_error:
+            print(f"⚠️ Email error: {str(email_error)}")
+            # Continue even if email fails
         
         response = jsonify({
             'success': True,
@@ -213,7 +248,7 @@ def submit_reservation():
         return response
         
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error processing reservation: {str(e)}")
         response = jsonify({
             'success': False,
             'message': f'Error submitting reservation: {str(e)}'

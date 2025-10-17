@@ -3,6 +3,8 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
+from src.models.user import db
+from src.models.borrow import Borrow
 
 borrow_bp = Blueprint('borrow', __name__)
 
@@ -39,6 +41,35 @@ def submit_borrow():
         class_other = data.get('classOther', 'N/A')
         tools = data.get('tools', 'N/A')
         supervisor = data.get('supervisor', 'N/A')
+        
+        # Combine class information
+        college_info = f"{class_type}{' (' + class_other + ')' if class_other != 'N/A' else ''}"
+        
+        # Save to database
+        try:
+            new_borrow = Borrow(
+                student_name=student_name,
+                student_id=student_id,
+                email=email,
+                phone=phone,
+                college=college_info,
+                major=dr,  # Using 'major' field for DR
+                equipment_type='Various',  # Default value
+                equipment_name=tools if tools != 'N/A' else 'Equipment list',
+                borrow_date=borrow_date,
+                return_date=return_date,
+                purpose=f"Class: {class_type}",
+                supervisor=supervisor,
+                status='Pending'
+            )
+            
+            db.session.add(new_borrow)
+            db.session.commit()
+            print(f"✅ Borrow request saved to database with ID: {new_borrow.id}")
+        except Exception as db_error:
+            print(f"❌ Database error: {str(db_error)}")
+            db.session.rollback()
+            # Continue to send email even if database save fails
         
         # Create email message
         msg = MIMEMultipart('alternative')
@@ -188,10 +219,15 @@ def submit_borrow():
         msg.attach(MIMEText(html_body, 'html'))
         
         # Send email
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.send_message(msg)
+        try:
+            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+                server.starttls()
+                server.login(SENDER_EMAIL, SENDER_PASSWORD)
+                server.send_message(msg)
+            print(f"✅ Email notification sent successfully")
+        except Exception as email_error:
+            print(f"⚠️ Email error: {str(email_error)}")
+            # Continue even if email fails
         
         response = jsonify({
             'success': True,
@@ -201,7 +237,7 @@ def submit_borrow():
         return response
         
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error processing borrow request: {str(e)}")
         response = jsonify({
             'success': False,
             'message': f'Error submitting borrow request: {str(e)}'

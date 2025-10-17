@@ -1,5 +1,7 @@
 from flask import Blueprint, jsonify, request
-from src.database import get_db_connection
+from src.models.user import db
+from src.models.reservation import Reservation
+from src.models.borrow import Borrow
 
 api_bp = Blueprint('api', __name__)
 
@@ -16,44 +18,10 @@ def get_all_reservations():
         return response
     
     try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+        reservations = Reservation.query.order_by(Reservation.created_at.desc()).all()
+        reservations_list = [r.to_dict() for r in reservations]
         
-        cur.execute("""
-            SELECT id, student_name, student_id, email, phone, college, department,
-                   date, from_time, to_time, duration, supervisor, studio_type,
-                   project_title, project_description, equipment_needed, status, created_at
-            FROM reservations
-            ORDER BY created_at DESC
-        """)
-        
-        reservations = []
-        for row in cur.fetchall():
-            reservations.append({
-                'id': row[0],
-                'studentName': row[1],
-                'studentId': row[2],
-                'email': row[3],
-                'phone': row[4],
-                'college': row[5],
-                'department': row[6],
-                'date': str(row[7]),
-                'fromTime': str(row[8]),
-                'toTime': str(row[9]),
-                'duration': row[10],
-                'supervisor': row[11],
-                'studioType': row[12],
-                'projectTitle': row[13],
-                'projectDescription': row[14],
-                'equipmentNeeded': row[15],
-                'status': row[16],
-                'createdAt': str(row[17])
-            })
-        
-        cur.close()
-        conn.close()
-        
-        response = jsonify(reservations)
+        response = jsonify(reservations_list)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
         
@@ -74,77 +42,51 @@ def manage_reservation(reservation_id):
         return response
     
     try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+        reservation = Reservation.query.get(reservation_id)
         
         if request.method == 'GET':
-            cur.execute("""
-                SELECT id, student_name, student_id, email, phone, college, department,
-                       date, from_time, to_time, duration, supervisor, studio_type,
-                       project_title, project_description, equipment_needed, status, created_at
-                FROM reservations
-                WHERE id = %s
-            """, (reservation_id,))
-            
-            row = cur.fetchone()
-            if not row:
+            if not reservation:
                 response = jsonify({'error': 'Reservation not found'})
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response, 404
             
-            reservation = {
-                'id': row[0],
-                'studentName': row[1],
-                'studentId': row[2],
-                'email': row[3],
-                'phone': row[4],
-                'college': row[5],
-                'department': row[6],
-                'date': str(row[7]),
-                'fromTime': str(row[8]),
-                'toTime': str(row[9]),
-                'duration': row[10],
-                'supervisor': row[11],
-                'studioType': row[12],
-                'projectTitle': row[13],
-                'projectDescription': row[14],
-                'equipmentNeeded': row[15],
-                'status': row[16],
-                'createdAt': str(row[17])
-            }
-            
-            response = jsonify(reservation)
+            response = jsonify(reservation.to_dict())
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
         elif request.method == 'PUT':
+            if not reservation:
+                response = jsonify({'error': 'Reservation not found'})
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response, 404
+                
             data = request.get_json()
             status = data.get('status')
             
             if status:
-                cur.execute("""
-                    UPDATE reservations
-                    SET status = %s
-                    WHERE id = %s
-                """, (status, reservation_id))
+                reservation.status = status
+                db.session.commit()
             
-            conn.commit()
             response = jsonify({'success': True, 'message': 'Reservation updated successfully'})
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
         elif request.method == 'DELETE':
-            cur.execute("DELETE FROM reservations WHERE id = %s", (reservation_id,))
-            conn.commit()
+            if not reservation:
+                response = jsonify({'error': 'Reservation not found'})
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response, 404
+                
+            db.session.delete(reservation)
+            db.session.commit()
+            
             response = jsonify({'success': True, 'message': 'Reservation deleted successfully'})
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
-        cur.close()
-        conn.close()
-        
     except Exception as e:
         print(f"Error managing reservation: {str(e)}")
+        db.session.rollback()
         response = jsonify({'error': str(e)})
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, 500
@@ -162,39 +104,10 @@ def get_all_borrows():
         return response
     
     try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+        borrows = Borrow.query.order_by(Borrow.created_at.desc()).all()
+        borrows_list = [b.to_dict() for b in borrows]
         
-        cur.execute("""
-            SELECT id, student_name, student_id, email, phone, college, department,
-                   equipment_name, quantity, borrow_date, return_date, purpose, status, created_at
-            FROM borrow_requests
-            ORDER BY created_at DESC
-        """)
-        
-        borrows = []
-        for row in cur.fetchall():
-            borrows.append({
-                'id': row[0],
-                'studentName': row[1],
-                'studentId': row[2],
-                'email': row[3],
-                'phone': row[4],
-                'college': row[5],
-                'department': row[6],
-                'equipmentName': row[7],
-                'quantity': row[8],
-                'borrowDate': str(row[9]),
-                'returnDate': str(row[10]),
-                'purpose': row[11],
-                'status': row[12],
-                'createdAt': str(row[13])
-            })
-        
-        cur.close()
-        conn.close()
-        
-        response = jsonify(borrows)
+        response = jsonify(borrows_list)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
         
@@ -215,72 +128,51 @@ def manage_borrow(borrow_id):
         return response
     
     try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+        borrow = Borrow.query.get(borrow_id)
         
         if request.method == 'GET':
-            cur.execute("""
-                SELECT id, student_name, student_id, email, phone, college, department,
-                       equipment_name, quantity, borrow_date, return_date, purpose, status, created_at
-                FROM borrow_requests
-                WHERE id = %s
-            """, (borrow_id,))
-            
-            row = cur.fetchone()
-            if not row:
+            if not borrow:
                 response = jsonify({'error': 'Borrow request not found'})
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response, 404
             
-            borrow = {
-                'id': row[0],
-                'studentName': row[1],
-                'studentId': row[2],
-                'email': row[3],
-                'phone': row[4],
-                'college': row[5],
-                'department': row[6],
-                'equipmentName': row[7],
-                'quantity': row[8],
-                'borrowDate': str(row[9]),
-                'returnDate': str(row[10]),
-                'purpose': row[11],
-                'status': row[12],
-                'createdAt': str(row[13])
-            }
-            
-            response = jsonify(borrow)
+            response = jsonify(borrow.to_dict())
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
         elif request.method == 'PUT':
+            if not borrow:
+                response = jsonify({'error': 'Borrow request not found'})
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response, 404
+                
             data = request.get_json()
             status = data.get('status')
             
             if status:
-                cur.execute("""
-                    UPDATE borrow_requests
-                    SET status = %s
-                    WHERE id = %s
-                """, (status, borrow_id))
+                borrow.status = status
+                db.session.commit()
             
-            conn.commit()
             response = jsonify({'success': True, 'message': 'Borrow request updated successfully'})
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
         elif request.method == 'DELETE':
-            cur.execute("DELETE FROM borrow_requests WHERE id = %s", (borrow_id,))
-            conn.commit()
+            if not borrow:
+                response = jsonify({'error': 'Borrow request not found'})
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response, 404
+                
+            db.session.delete(borrow)
+            db.session.commit()
+            
             response = jsonify({'success': True, 'message': 'Borrow request deleted successfully'})
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         
-        cur.close()
-        conn.close()
-        
     except Exception as e:
         print(f"Error managing borrow request: {str(e)}")
+        db.session.rollback()
         response = jsonify({'error': str(e)})
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response, 500
