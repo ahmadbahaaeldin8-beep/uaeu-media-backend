@@ -15,7 +15,7 @@ from src.routes.reservation_reminder import reservation_reminder_bp
 from src.routes.borrow_reminder import borrow_reminder_bp
 from src.routes.api import api_bp
 
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
 
 # Enable CORS for all routes
