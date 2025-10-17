@@ -54,9 +54,14 @@ try:
 except Exception as e:
     print(f"Database setup error: {e}")
 
+# Serve static files only for non-API routes
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    # Don't intercept API routes
+    if path.startswith('api/'):
+        return "Not Found", 404
+    
     static_folder_path = app.static_folder
     if static_folder_path is None:
             return "Static folder not configured", 404
